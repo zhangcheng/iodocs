@@ -1,4 +1,10 @@
 {
+    "anobii": {
+        "name": "Anobii API",
+        "protocol": "http",
+        "baseURL": "api.anobii.local",
+        "publicPath": "/v1"
+    },
     "klout": {
         "name": "Klout API",
         "protocol": "http",

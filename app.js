@@ -27,21 +27,20 @@
 var express     = require('express'),
     util        = require('util'),
     fs          = require('fs'),
-    sys         = require('sys'),
     OAuth       = require('oauth').OAuth,
     query       = require('querystring'),
     url         = require('url'),
     http        = require('http'),
+    crypto      = require('crypto'),
     redis       = require('redis'),
-    RedisStore  = require('connect-redis')(express),
-    hashlib     = require('hashlib');
+    RedisStore  = require('connect-redis')(express);
 
 // Configuration
 try {
     var configJSON = fs.readFileSync(__dirname + "/config.json");
     var config = JSON.parse(configJSON.toString());
 } catch(e) {
-    sys.puts("File config.json not found or is invalid.  Try: `cp config.json.sample config.json`");
+    console.error("File config.json not found or is invalid.  Try: `cp config.json.sample config.json`");
     process.exit(1);
 }
 
@@ -311,13 +310,38 @@ function processRequest(req, res, next) {
         privateReqURL = apiConfig.protocol + '://' + apiConfig.baseURL + apiConfig.privatePath + methodURL + ((paramString.length > 0) ? '?' + paramString : ""),
         options = {
             headers: {},
-            protocol: apiConfig.protocol,
+            protocol: apiConfig.protocol + ':',
             host: baseHostUrl,
             port: baseHostPort,
             method: httpMethod,
-            path: apiConfig.publicPath + methodURL + ((paramString.length > 0) ? '?' + paramString : "")
+            path: apiConfig.publicPath + methodURL
         };
-
+        if (apiConfig.port) {
+            options.port = apiConfig.port;
+        }
+        if (paramString) {
+            switch (httpMethod) {
+                case 'GET':
+                case 'DELETE':
+                    privateReqURL += '?' + paramString;
+                    options.path += '?' + paramString;
+                    break;
+                case 'PUT':
+                case 'POST':
+                    console.log('headers: ' + util.inspect(reqQuery.headerNames));
+                    var _body = paramString;
+                    for (var k in reqQuery.headerNames) {
+                        if ('Content-Type' == reqQuery.headerNames[k]) {
+                            if ('application/json' == reqQuery.headerValues[k]) {
+                                _body = JSON.stringify(params);
+                            }
+                            break;
+                        }
+                    }
+                    options.body = _body;
+                    break;
+            }
+        }
     if (apiConfig.oauth) {
         console.log('Using OAuth');
 
@@ -342,7 +366,7 @@ function processRequest(req, res, next) {
                     console.log(apiSecret);
                     console.log(accessToken);
                     console.log(accessTokenSecret);
-                    
+
                     var oa = new OAuth(apiConfig.oauth.requestURL || null,
                                        apiConfig.oauth.accessURL || null,
                                        apiKey || null,
@@ -470,7 +494,12 @@ function processRequest(req, res, next) {
 
         // Add API Key to params, if any.
         if (apiKey != '' && apiKey != 'undefined' && apiKey != undefined) {
-            options.path += '&' + apiConfig.keyParam + '=' + apiKey;
+            if (options.path.indexOf('?') !== -1) {
+                options.path += '&';
+            } else {
+                options.path += '?';
+            }
+            options.path += apiConfig.keyParam + '=' + apiKey;
         }
 
         // Perform signature routine, if any.
@@ -478,13 +507,13 @@ function processRequest(req, res, next) {
             if (apiConfig.signature.type == 'signed_md5') {
                 // Add signature parameter
                 var timeStamp = Math.round(new Date().getTime()/1000);
-                var sig = hashlib.md5('' + apiKey + apiSecret + timeStamp + '', { asString: true });
+                var sig = crypto.createHash('md5').update('' + apiKey + apiSecret + timeStamp + '').disgest('base64');
                 options.path += '&' + apiConfig.signature.sigParam + '=' + sig;
             }
             else if (apiConfig.signature.type == 'signed_sha256') { // sha256(key+secret+epoch)
                 // Add signature parameter
                 var timeStamp = Math.round(new Date().getTime()/1000);
-                var sig = hashlib.sha256('' + apiKey + apiSecret + timeStamp + '', { asString: true });
+                var sig = crypto.createHash('sha256').update('' + apiKey + apiSecret + timeStamp + '').digest('base64');
                 options.path += '&' + apiConfig.signature.sigParam + '=' + sig;
             }
         }
@@ -509,7 +538,7 @@ function processRequest(req, res, next) {
         }
 
         if (!options.headers['Content-Length']) {
-            options.headers['Content-Length'] = 0;
+            options.headers['Content-Length'] = options.body.length;
         }
 
         if (config.debug) {
@@ -568,6 +597,8 @@ function processRequest(req, res, next) {
             };
         });
 
+        apiCall.write(options.body);
+
         apiCall.end();
     }
 }
@@ -577,18 +608,18 @@ function processRequest(req, res, next) {
 app.dynamicHelpers({
     session: function(req, res) {
     // If api wasn't passed in as a parameter, check the path to see if it's there
- 	    if (!req.params.api) {
- 	    	pathName = req.url.replace('/','');
- 	    	// Is it a valid API - if there's a config file we can assume so
- 	    	fs.stat('public/data/' + pathName + '.json', function (error, stats) {
-   				if (stats) {
-   					req.params.api = pathName;
-   				}
- 			});
- 	    }       
- 	    // If the cookie says we're authed for this particular API, set the session to authed as well
+         if (!req.params.api) {
+             pathName = req.url.replace('/','');
+             // Is it a valid API - if there's a config file we can assume so
+             fs.stat('public/data/' + pathName + '.json', function (error, stats) {
+                   if (stats) {
+                       req.params.api = pathName;
+                   }
+             });
+         }
+         // If the cookie says we're authed for this particular API, set the session to authed as well
         if (req.params.api && req.session[req.params.api] && req.session[req.params.api]['authed']) {
-         	req.session['authed'] = true;
+             req.session['authed'] = true;
         }
 
         return req.session;

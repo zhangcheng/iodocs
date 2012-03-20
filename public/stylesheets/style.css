@@ -231,6 +231,12 @@ button::-moz-focus-inner {
   padding: 0;
 }
 
+input[type=text],
+textarea {
+  border: 1px solid #aaa;
+  padding: 2px 1px;
+}
+
 input:invalid,
 textarea:invalid {
   -moz-border-radius: 1px;
@@ -239,10 +245,17 @@ textarea:invalid {
   -ms-border-radius: 1px;
   -khtml-border-radius: 1px;
   border-radius: 1px;
-  -moz-box-shadow: 0, 0, 5px, red;
-  -webkit-box-shadow: 0, 0, 5px, red;
-  -o-box-shadow: 0, 0, 5px, red;
-  box-shadow: 0, 0, 5px, red;
+  -moz-box-shadow: 0 0 5px red;
+  -webkit-box-shadow: 0 0 5px red;
+  -o-box-shadow: 0 0 5px red;
+  box-shadow: 0 0 5px red;
+}
+
+input[type=text]:invalid,
+textarea:invalid {
+  border: 1px solid #aaa;
+  padding: 2px 1px;
+  -webkit-appearance: none;
 }
 
 .no-boxshadow input:invalid,

@@ -1,4 +1,4 @@
-h1=apiInfo.name 
+h1=apiInfo.name
 - if (session.authed && apiInfo.oauth && apiInfo.oauth.type =='three-legged')
     - var authed ='authed'
 - else
@@ -7,7 +7,7 @@ h1=apiInfo.name
 
 form#credentials
     input(type='hidden', name='apiName', value=apiName)
-    - if (apiInfo.auth) 
+    - if (apiInfo.auth)
         section(class='credentials ' + authed)
          - if (authed && apiInfo.oauth)
              span Authenticated with OAuth
@@ -102,7 +102,7 @@ ul
                                                       - if (parameter.Type =='enumerated')
                                                           select(name='params[' + parameter.Name + ']', placeholder=className)
                                                             - if (parameter.Default =='')
-                                                                option(value='') 
+                                                                option(value='')
                                                             - each choice in parameter.EnumeratedList
                                                                 - if (parameter.Default ==choice)
                                                                         option(value=choice, selected=true) #{choice}
@@ -111,17 +111,21 @@ ul
                                                       - else if (parameter.Type =='boolean')
                                                            select(name='params[' + parameter.Name + ']', placeholder=className)
                                                                 - if (parameter.Default =='')
-                                                                        option(value='') 
+                                                                        option(value='')
                                                                 - each choice in [apiInfo.booleanTrueVal,apiInfo.booleanFalseVal]
                                                                    - if (parameter.Default ==choice)
                                                                            option(value=choice, selected=true) #{choice}
                                                                    - else
                                                                            option(value=choice) #{choice}
                                                       - else
-                                                          input(name='params[' + parameter.Name + ']', value=parameter.Default, placeholder=className)
+                                                          input(name='params[' + parameter.Name + ']', value=parameter.Default,
+                                                          placeholder=className,
+                                                          pattern=parameter.Pattern,
+                                                          title=parameter.Type
+                                                          )
                                                   td.type=parameter.Type
                                                   td.description=parameter.Description || 'No description'
-                            - if (method.headers && method.headers.length > 0)
+                            - if (method.headers)
                                 div.headers
                                     h4.title
                                         div.indicator
@@ -137,13 +141,14 @@ ul
                                                     th Name
                                                     th(colspan='2') Value
                                             tbody
-                                                tr
-                                                    td
-                                                        input(name='headerNames[]', placeholder='Name')
-                                                    td
-                                                        input(name='headerValues[]', placeholder='Value')
-                                                    td
-                                                        a(href='#', class='remove') Remove
+                                                - each value, name in method.headers
+                                                    tr
+                                                        td
+                                                            input(name='headerNames[]', placeholder='Name', value=name)
+                                                        td
+                                                            input(name='headerValues[]', placeholder='Value', value=value)
+                                                        td
+                                                            a(href='#', class='remove') Remove
                                         a(href='#', class='add-headers') Add Header
                                     // Create header fields and button to add/remove headers.
                             - if (!method['read-only'])

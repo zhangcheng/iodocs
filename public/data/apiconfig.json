@@ -3,7 +3,10 @@
         "name": "Anobii API",
         "protocol": "http",
         "baseURL": "api.anobii.local",
-        "publicPath": "/v1"
+        "publicPath": "/v1",
+        "plugin": "anobii.js",
+        "auth": "key",
+        "signature":"true"
     },
     "klout": {
         "name": "Klout API",

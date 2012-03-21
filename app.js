@@ -274,15 +274,16 @@ function processRequest(req, res, next) {
         console.log(util.inspect(req.body, null, 3));
     };
 
-    var reqQuery = req.body,
-        params = reqQuery.params || {},
-        methodURL = reqQuery.methodUri,
+    var reqQuery   = req.body,
+        params     = reqQuery.params || {},
+        methodURL  = reqQuery.methodUri,
         httpMethod = reqQuery.httpMethod,
-        apiKey = reqQuery.apiKey,
-        apiSecret = reqQuery.apiSecret,
-        apiName = reqQuery.apiName
-        apiConfig = apisConfig[apiName],
-        key = req.sessionID + ':' + apiName;
+        apiKey     = reqQuery.apiKey,
+        apiSecret  = reqQuery.apiSecret,
+        apiName    = reqQuery.apiName
+        apiConfig  = apisConfig[apiName],
+        key        = req.sessionID + ':' + apiName,
+        plugin     = apiConfig['plugin'] ? require('./plugins/' + apiConfig['plugin']) : require('./plugins/null.js');
 
     // Replace placeholders in the methodURL with matching params
     for (var param in params) {
@@ -309,13 +310,14 @@ function processRequest(req, res, next) {
     var paramString = query.stringify(params),
         privateReqURL = apiConfig.protocol + '://' + apiConfig.baseURL + apiConfig.privatePath + methodURL + ((paramString.length > 0) ? '?' + paramString : ""),
         options = {
-            headers: {},
+            headers: plugin.getHeaders(httpMethod, apiConfig.publicPath + methodURL + (httpMethod[0] != 'P' ? (methodURL.indexOf('?') == -1 ? '?' : '&') + paramString : ''), apiKey, apiSecret),
             protocol: apiConfig.protocol + ':',
             host: baseHostUrl,
             port: baseHostPort,
             method: httpMethod,
             path: apiConfig.publicPath + methodURL
-        };
+        },
+        body = undefined;
         if (apiConfig.port) {
             options.port = apiConfig.port;
         }
@@ -328,17 +330,7 @@ function processRequest(req, res, next) {
                     break;
                 case 'PUT':
                 case 'POST':
-                    console.log('headers: ' + util.inspect(reqQuery.headerNames));
-                    var _body = paramString;
-                    for (var k in reqQuery.headerNames) {
-                        if ('Content-Type' == reqQuery.headerNames[k]) {
-                            if ('application/json' == reqQuery.headerValues[k]) {
-                                _body = JSON.stringify(params);
-                            }
-                            break;
-                        }
-                    }
-                    options.body = _body;
+                    body = plugin.getBody(params);
                     break;
             }
         }
@@ -493,7 +485,7 @@ function processRequest(req, res, next) {
         console.log('Unsecured Call');
 
         // Add API Key to params, if any.
-        if (apiKey != '' && apiKey != 'undefined' && apiKey != undefined) {
+        if (apiKey != '' && apiKey != 'undefined' && apiKey != undefined && apiConfig.keyParam) {
             if (options.path.indexOf('?') !== -1) {
                 options.path += '&';
             } else {
@@ -535,10 +527,11 @@ function processRequest(req, res, next) {
             }
 
             options.headers = headers;
+
         }
 
         if (!options.headers['Content-Length']) {
-            options.headers['Content-Length'] = options.body.length;
+            options.headers['Content-Length'] = body.length;
         }
 
         if (config.debug) {
@@ -583,7 +576,7 @@ function processRequest(req, res, next) {
                 req.call = url.format(req.call);
 
                 // Response body
-                req.result = body;
+                req.result = plugin.handleResponse(body);
 
                 console.log(util.inspect(body));
 
@@ -597,7 +590,9 @@ function processRequest(req, res, next) {
             };
         });
 
-        apiCall.write(options.body);
+        if ('P' == options.method[0]) {
+            apiCall.write(body);
+        }
 
         apiCall.end();
     }

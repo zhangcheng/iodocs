@@ -5,8 +5,8 @@ function AnobiiAPI()
 {
     // Init variables
     this.sessionId = 0;
-    this.apiSecret = '';
-    this.apiKey = '';
+    this.apiSecret = undefined;
+    this.apiKey = undefined;
 
 };
 
@@ -15,6 +15,11 @@ AnobiiAPI.prototype = {
     {
         this.apiSecret = secret || this.apiSecret;
         this.apiKey = key || this.apiKey;
+
+        if (!this.apiKey || !this.apiSecret) {
+            return undefined;
+        }
+
         var time = this._getTime(),
             nonce = this._getNonce(),
             base = sprintf('%s %s %s %d %s', method, url, this.sessionId, time, nonce),
@@ -58,6 +63,10 @@ exports.getHeaders = function(method, url, key, secret)
         'Authorization': api.getAuthHeader(method, url, key, secret),
         'Content-Type': 'application/json'
     };
+
+    if (!obj.Authorization) {
+        delete obj.Authorization;
+    }
 
     return obj;
 };

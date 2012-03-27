@@ -1,112 +1,427 @@
 {
-   "endpoints":[
-      {
-         "name":"Topics",
-         "methods":[
-            {
-               "MethodName":"List topics",
-               "Synopsis":"List all topics",
-               "HTTPMethod":"GET",
-               "URI":"/topic",
-               "RequiresOAuth":"N",
-               "parameters":[
-                  {
-                     "Name":"sort",
-                     "Required":"Y",
-                     "Default":"editions",
-                     "Type":"enumerated",
-                     "EnumeratedList": [
-                         "editions",
-                         "featured",
-                         "people",
-                         "title",
-                         "creator"
-                     ],
-                     "Description":"How to sort the list of topics"
-                  },
-                  {
-                     "Name":"direction",
-                     "Required":"N",
-                     "Type":"enumerated",
-                     "EnumeratedList": [
-                         "default",
-                         "asc",
-                         "desc"
-                     ],
-                     "Description":"The direction in which to order the results"
-                  },
-                  {
-                     "Name":"page",
-                     "Required":"N",
-                     "Type":"integer",
-                     "Description":"Which page to return",
-                     "Pattern":"[0-9]+"
-                  },
-                  {
-                     "Name":"rows",
-                     "Required":"N",
-                     "Type":"integer",
-                     "Description":"How many results to return (0-100)",
-                     "Pattern":"(?:100|[0-9]{0,2})"
-                  }
-               ]
-            },
-            {
-               "MethodName":"Add topic",
-               "Synopsis":"Add a topic",
-               "HTTPMethod":"POST",
-               "URI":"/topic",
-               "RequiresOAuth":"N",
-               "parameters":[
-                  {
-                     "Name":"title",
-                     "Required":"Y",
-                     "Default":"",
-                     "Type":"string",
-                     "Description":"A name for the topic"
-                  },
-                  {
-                     "Name":"description",
-                     "Required":"N",
-                     "Default":"",
-                     "Type":"text",
-                     "Description":"A description for the topic"
-                  }
-               ]
-            }
-         ]
-      },
-      {
-          "name":"Login",
-          "methods":[
-            {
-                "MethodName":"Login",
-                "Synopsis":"Login as a site user",
-                "HTTPMethod":"POST",
-                "URI":"/person/login",
-                "RequiresOAuth":"N",
-                "parameters":[
+    "endpoints": [
+        {
+            "methods": [
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "List topics",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "List all topics",
+                    "URI": "/topic",
+                    "parameters": [
+                        {
+                            "Default": "editions",
+                            "Description": "How to sort the list of topics",
+                            "EnumeratedList": [
+                                "editions",
+                                "featured",
+                                "people",
+                                "title",
+                                "creator"
+                            ],
+                            "Name": "sort",
+                            "Required": "Y",
+                            "Type": "enumerated"
+                        },
+                        {
+                            "Description": "The direction in which to order the results",
+                            "EnumeratedList": [
+                                "default",
+                                "asc",
+                                "desc"
+                            ],
+                            "Name": "direction",
+                            "Required": "N",
+                            "Type": "enumerated"
+                        },
+                        {
+                            "Description": "Which page to return",
+                            "Name": "page",
+                            "Pattern": "[0-9]+",
+                            "Required": "N",
+                            "Type": "integer"
+                        },
+                        {
+                            "Description": "How many results to return (0-100)",
+                            "Name": "rows",
+                            "Pattern": "(?:100|[0-9]{0,2})",
+                            "Required": "N",
+                            "Type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "HTTPMethod": "POST",
+                    "MethodName": "Add topic",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Add a topic",
+                    "URI": "/topic",
+                    "parameters": [
+                        {
+                            "Default": "",
+                            "Description": "A name for the topic",
+                            "Name": "title",
+                            "Required": "Y",
+                            "Type": "string"
+                        },
+                        {
+                            "Default": "",
+                            "Description": "A description for the topic",
+                            "Name": "description",
+                            "Required": "N",
+                            "Type": "text"
+                        }
+                    ]
+                }    ,
                     {
-                        "Name":"email",
-                        "Required":"Y",
-                        "Default":"anobii@mailinator.com",
-                        "Type":"email",
-                        "Description":"The user's email"
+                        "HTTPMethod": "GET",
+                        "MethodName": "List contributors",
+                        "RequiresOAuth": "N",
+                        "Synopsis": "Lists all contributors to a specific topics",
+                        "URI": "/person?contributor",
+                        "parameters": [
+                            {
+                                "Name": "topic",
+                                "Type":    "integer",
+                                "Pattern": "[0-9]+",
+                                "Required": "Y",
+                                "Description": "Topic to find contributors for"
+                            },
+                            {
+                                "Name": "filter",
+                                "Type": "enumerated",
+                                "EnumeratedList": [
+                                    "",
+                                    "followers",
+                                    "following"
+                                ],
+                                "Required": "N"
+                            },
+                            {
+                                "Default": "editions",
+                                "Description": "How to sort the list of people",
+                                "EnumeratedList": [
+                                    "",
+                                    "contributions"
+                                ],
+                                "Name": "sort",
+                                "Required": "N",
+                                "Type": "enumerated"
+                            },
+                            {
+                                "Description": "The direction in which to order the results",
+                                "EnumeratedList": [
+                                    "default",
+                                    "asc",
+                                    "desc"
+                                ],
+                                "Name": "direction",
+                                "Required": "N",
+                                "Type": "enumerated"
+                            },
+                            {
+                                "Description": "Which page to return",
+                                "Name": "page",
+                                "Pattern": "[0-9]+",
+                                "Required": "N",
+                                "Type": "integer"
+                            },
+                            {
+                                "Description": "How many results to return (0-100)",
+                                "Name": "rows",
+                                "Pattern": "(?:100|[0-9]{0,2})",
+                                "Required": "N",
+                                "Type": "integer"
+                            }
+                        ]
                     },
                     {
-                        "Name":"password",
-                        "Required":"Y",
-                        "Default":"anobii",
-                        "Type":"string",
-                        "Description":"The user's password"
+                        "HTTPMethod": "GET",
+                        "MethodName": "List people",
+                        "RequiresOAuth": "N",
+                        "Synopsis": "Lists all people in a topic",
+                        "URI": "/person",
+                        "parameters": [
+                            {
+                                "Name": "topic",
+                                "Type":    "integer",
+                                "Pattern": "[0-9]+",
+                                "Required": "Y",
+                                "Description": "Topic to find contributors for"
+                            },
+                            {
+                                "Description": "How to sort the list of people",
+                                "EnumeratedList": [
+                                    ""
+                                ],
+                                "Name": "sort",
+                                "Required": "N",
+                                "Type": "enumerated"
+                            },
+                            {
+                                "Description": "The direction in which to order the results",
+                                "EnumeratedList": [
+                                    "",
+                                    "followers",
+                                    "following"
+                                ],
+                                "Name": "filter",
+                                "Required": "N",
+                                "Type": "enumerated"
+                            },
+                            {
+                                "Description": "The direction in which to order the results",
+                                "EnumeratedList": [
+                                    "default",
+                                    "asc",
+                                    "desc"
+                                ],
+                                "Name": "direction",
+                                "Required": "N",
+                                "Type": "enumerated"
+                            },
+                            {
+                                "Description": "Which page to return",
+                                "Name": "page",
+                                "Pattern": "[0-9]+",
+                                "Required": "N",
+                                "Type": "integer"
+                            },
+                            {
+                                "Description": "How many results to return (0-100)",
+                                "Name": "rows",
+                                "Pattern": "(?:100|[0-9]{0,2})",
+                                "Required": "N",
+                                "Type": "integer"
+                            }
+                        ]
                     }
-                ],
-                "headers":{
-                    "Content-Type": "application/json"
+            ],
+            "name": "Topics"
+        },
+        {
+            "methods": [
+                {
+                    "HTTPMethod": "POST",
+                    "MethodName": "Login",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Login as a site user",
+                    "URI": "/person/login",
+                    "headers": {
+                        "Content-Type": "application/json"
+                    },
+                    "parameters": [
+                        {
+                            "Default": "anobii@mailinator.com",
+                            "Description": "The user's email",
+                            "Name": "email",
+                            "Required": "Y",
+                            "Type": "email"
+                        },
+                        {
+                            "Default": "anobii",
+                            "Description": "The user's password",
+                            "Name": "password",
+                            "Required": "Y",
+                            "Type": "string"
+                        }
+                    ]
                 }
-            }
-          ]
-      }
-   ]
+            ],
+            "name": "Login"
+        },
+        {
+            "name": "Person",
+            "methods": [
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "List contributions",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Lists all topics contributed to by a user",
+                    "URI": "/topic?contributor",
+                    "parameters": [
+                        {
+                            "Name": "person",
+                            "Type":    "integer",
+                            "Pattern": "[0-9]+",
+                            "Required": "Y",
+                            "Description": "Person to find contributions of"
+                        },
+                        {
+                            "Default": "editions",
+                            "Description": "How to sort the list of topics",
+                            "EnumeratedList": [
+                                "",
+                                "contributions"
+                            ],
+                            "Name": "sort",
+                            "Required": "N",
+                            "Type": "enumerated"
+                        },
+                        {
+                            "Description": "The direction in which to order the results",
+                            "EnumeratedList": [
+                                "default",
+                                "asc",
+                                "desc"
+                            ],
+                            "Name": "direction",
+                            "Required": "N",
+                            "Type": "enumerated"
+                        },
+                        {
+                            "Description": "Which page to return",
+                            "Name": "page",
+                            "Pattern": "[0-9]+",
+                            "Required": "N",
+                            "Type": "integer"
+                        },
+                        {
+                            "Description": "How many results to return (0-100)",
+                            "Name": "rows",
+                            "Pattern": "(?:100|[0-9]{0,2})",
+                            "Required": "N",
+                            "Type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "List followers",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "List the followers of a user",
+                    "URI": "/person",
+                    "parameters": [
+                        {
+                            "Name": "person",
+                            "Type":    "integer",
+                            "Pattern": "[0-9]+",
+                            "Required": "Y",
+                            "Description": "Person to find followers of"
+                        },
+                        {
+                            "EnumeratedList": [
+                                "",
+                                "followers",
+                                "following"
+                            ],
+                            "Name": "filter",
+                            "Required": "N",
+                            "Type": "enumerated"
+                        },
+                        {
+                            "Description": "Which page to return",
+                            "Name": "page",
+                            "Pattern": "[0-9]+",
+                            "Required": "N",
+                            "Type": "integer"
+                        },
+                        {
+                            "Description": "How many results to return (0-100)",
+                            "Name": "rows",
+                            "Pattern": "(?:100|[0-9]{0,2})",
+                            "Required": "N",
+                            "Type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "List users a user is following",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "List the users a user is following",
+                    "URI": "/person",
+                    "parameters": [
+                        {
+                            "Name": "follower",
+                            "Type":    "integer",
+                            "Pattern": "[0-9]+",
+                            "Required": "Y",
+                            "Description": "Person to subscriptions of"
+                        },
+                        {
+                            "EnumeratedList": [
+                                "",
+                                "followers",
+                                "following"
+                            ],
+                            "Name": "filter",
+                            "Required": "N",
+                            "Type": "enumerated"
+                        },
+                        {
+                            "Description": "Which page to return",
+                            "Name": "page",
+                            "Pattern": "[0-9]+",
+                            "Required": "N",
+                            "Type": "integer"
+                        },
+                        {
+                            "Description": "How many results to return (0-100)",
+                            "Name": "rows",
+                            "Pattern": "(?:100|[0-9]{0,2})",
+                            "Required": "N",
+                            "Type": "integer"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Book",
+            "methods": [
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "List libraries",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Lists all the libraries this book appears in",
+                    "URI": "/library",
+                    "parameters": [
+                        {
+                            "Name": "book",
+                            "Type":    "integer",
+                            "Pattern": "[0-9]+",
+                            "Required": "Y",
+                            "Description": "Book to find in libraries"
+                        },
+                        {
+                            "Name": "filter",
+                            "Type": "enumerated",
+                            "EnumeratedList": [
+                                "",
+                                "followers",
+                                "following"
+                            ],
+                            "Required": "N"
+                        },
+                        {
+                            "Description": "The direction in which to order the results",
+                            "EnumeratedList": [
+                                "default",
+                                "asc",
+                                "desc"
+                            ],
+                            "Name": "direction",
+                            "Required": "N",
+                            "Type": "enumerated"
+                        },
+                        {
+                            "Description": "Which page to return",
+                            "Name": "page",
+                            "Pattern": "[0-9]+",
+                            "Required": "N",
+                            "Type": "integer"
+                        },
+                        {
+                            "Description": "How many results to return (0-100)",
+                            "Name": "rows",
+                            "Pattern": "(?:100|[0-9]{0,2})",
+                            "Required": "N",
+                            "Type": "integer"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }
-

@@ -325,8 +325,8 @@ function processRequest(req, res, next) {
             switch (httpMethod) {
                 case 'GET':
                 case 'DELETE':
-                    privateReqURL += '?' + paramString;
-                    options.path += '?' + paramString;
+                    privateReqURL += (privateReqURL.indexOf('?') == -1 ? '?' : '&') + paramString;
+                    options.path += (options.path.indexOf('?') == -1 ? '?' : '&') + paramString;
                     break;
                 case 'PUT':
                 case 'POST':
@@ -531,7 +531,7 @@ function processRequest(req, res, next) {
         }
 
         if (!options.headers['Content-Length']) {
-            options.headers['Content-Length'] = body.length;
+            options.headers['Content-Length'] = body ? body.length : 0;
         }
 
         if (config.debug) {

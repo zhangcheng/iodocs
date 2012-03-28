@@ -2,7 +2,7 @@
     "anobii": {
         "name": "Anobii API",
         "protocol": "http",
-        "baseURL": "api.anobii.local",
+        "baseURL": "v2api-integration.ldn.anobii.com",
         "publicPath": "/v1",
         "plugin": "anobii.js",
         "auth": "key",

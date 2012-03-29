@@ -207,9 +207,6 @@
                     "RequiresOAuth": "N",
                     "Synopsis": "Login as a site user",
                     "URI": "/person/login",
-                    "headers": {
-                        "Content-Type": "application/json"
-                    },
                     "parameters": [
                         {
                             "Default": "anobii@mailinator.com",
@@ -229,6 +226,43 @@
                 }
             ],
             "name": "Login"
+        },
+{
+            "methods": [
+                {
+                    "HTTPMethod": "POST",
+                    "MethodName": "Create Purchase",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "creates a purchase",
+                    "URI": "/purchase",
+                    "parameters": [
+                        {
+                            "Default": "GB",
+                            "Description": "The country",
+                            "Name": "country",
+                            "Required": "Y",
+                            "Type": "text"
+                        },
+                        {
+                            "Default": "",
+                            "Description": "id of an edition",
+                            "Name": "edition[id",
+                            "Required": "Y",
+                            "Type": "integer",
+			    "Pattern": "[0-9]+"
+                        },
+                        {
+                            "Default": "",
+                            "Description": "id of the user",
+                            "Name": "person[id",
+                            "Required": "Y",
+                            "Type": "integer",
+			    "Pattern": "[0-9]+"
+                        }
+                    ]
+                }
+            ],
+            "name": "Purchase"
         },
         {
             "name": "Person",

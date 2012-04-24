@@ -50,7 +50,7 @@ ul
     - each endpoint in apiDefinition.endpoints
         li.endpoint
             h3.title
-                span.name=endpoint.name
+                span.name=endpoint.name + ' API Methods'
                 ul.actions
                     li.list-methods
                         a(href='#') List Methods
@@ -75,8 +75,14 @@ ul
                             input(type='hidden', name='methodUri', value=method.URI)
 
                             span.description #{method.Synopsis}
+
+                            - if (method.responseJsonSchema)
+                                h4 Response Schema
+                                pre.prettyprint!=method.responseJsonSchema.prettyString
+
                             br
                             br
+
                             - if (method.parameters.length > 0)
                                 table.parameters
                                     thead
@@ -148,3 +154,15 @@ ul
                                     // Create header fields and button to add/remove headers.
                             - if (!method['read-only'])
                                 input(type='submit', id=method.MethodName, value='Try it!')
+
+                - if (endpoint.jsonSchemas)
+                    h4.title
+                        span.name=endpoint.name + ' Object Schemas'
+                    - each jsonSchema in endpoint.jsonSchemas
+                        li.method.get
+                            a(name='jsonType-' + jsonSchema.name)
+                            div.title
+                                span.name=jsonSchema.name
+                            div.description=jsonSchema.description
+                            pre.prettyprint!=jsonSchema.prettyString
+

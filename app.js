@@ -613,10 +613,43 @@ app.dynamicHelpers({
     apiDefinition: function(req, res) {
         if (req.params.api) {
             var data = fs.readFileSync('public/data/' + req.params.api + '.json');
-            return JSON.parse(data);
+            var jsonData = JSON.parse(data);
+            if(jsonData.endpoints != null) {
+                jsonData.endpoints = jsonData.endpoints.map(parseEndpointsJsonSchema);
+            }
+            return jsonData;
         }
     }
 })
+
+function parseEndpointsJsonSchema(endpoint) {
+    if(endpoint.methods != null) {
+        endpoint.methods = endpoint.methods.map(parseMethodJsonSchema);
+    }
+    if(endpoint.jsonSchemas != null) {
+        endpoint.jsonSchemas = endpoint.jsonSchemas.map(parseJsonSchema);
+    }
+    return endpoint;
+}
+
+function parseMethodJsonSchema(method) {
+    if(method.responseJsonSchema != null) {
+        method.responseJsonSchema = parseJsonSchema(method.responseJsonSchema);
+    }
+    return method;
+}
+
+function parseJsonSchema(jsonSchema) {
+    jsonSchema.prettyString = JSON.stringify(jsonSchema.properties, addTypeAnchors, '    ');
+    return jsonSchema;
+}
+
+function addTypeAnchors(key, value) {  
+  if (typeof(value) == "string") {
+    return "<a href='#jsonType-" + value + "'>" + value + "</a>";  
+  }  
+  return value;  
+} 
 
 //
 // Routes

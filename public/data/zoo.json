@@ -1,0 +1,48 @@
+{
+   "endpoints":[
+      {
+         "name":"Zoo",
+         "methods":[
+            {
+               "MethodName":"Animals",
+               "Synopsis":"Returns all animals in the zoo ",
+               "HTTPMethod":"GET",
+               "URI":"/animals",
+               "RequiresOAuth":"N",
+               "parameters":[],
+               "responseJsonSchema": {
+                    "properties": {
+                        "errors":"Errors",
+                        "meta": "Meta",
+                        "data": {
+                            "animals": [
+                                "Animal",
+                                "Animal",
+                                "Animal"
+                            ]
+                        }
+                    }   
+                }
+            }
+         ],
+        "jsonSchemas": [
+            {
+                "name":"Animal",
+                "description": "This is an Animal",
+                "properties": {
+                    "name":"string",
+                    "age":"number",
+                    "species": "Species"
+                }   
+            }, {
+                "name":"Species",
+                "description": "This is an Species",
+                "properties": {
+                    "name":"string"
+                }   
+            }
+        ]
+      }
+   ]
+}
+

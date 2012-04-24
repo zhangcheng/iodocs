@@ -301,7 +301,7 @@ h4 {
 }
 
 ul {
-  margin: 0;
+    margin: 0 0 20px 0;
 }
 
 li {
@@ -558,6 +558,11 @@ li {
   clear: both;
   padding: 15px;
   display: none;
+}
+
+div.description {
+    margin: 5px 0px 10px 20px;
+    color: #777;
 }
 
 .method form a.clear-results {

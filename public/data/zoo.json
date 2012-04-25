@@ -11,15 +11,22 @@
                "RequiresOAuth":"N",
                "parameters":[],
                "responseBodyJsonSchema": {
+                    "type": "object",
                     "properties": {
-                        "errors":"Errors",
-                        "meta": "Meta",
+                        "errors":{"extends": "Errors"},
+                        "meta": {"extends": "Meta"},
                         "data": {
-                            "animals": [
-                                "Animal",
-                                "Animal",
-                                "Animal"
-                            ]
+                            "type": "object",
+                            "properties": {
+                                "animals": {
+                                    "type": "array",
+                                    "items": [
+                                        {"extends": "Animal"},
+                                        {"extends": "Animal"},
+                                        {"extends": "Animal"}
+                                    ]
+                                }
+                            }
                         }
                     }   
                 }
@@ -32,20 +39,25 @@
                "RequiresOAuth":"N",
                "parameters":[],
                "requestBodyJsonSchema": {
-                    "properties": {
-                        "animal":"Animal"
-                    }   
+                    "extends": "Animal"
                 },
                "responseBodyJsonSchema": {
+                    "type": "object",
                     "properties": {
-                        "errors":"Errors",
-                        "meta": "Meta",
+                        "errors":{"extends": "Errors"},
+                        "meta": {"extends": "Meta"},
                         "data": {
-                            "animals": [
-                                "Animal",
-                                "Animal",
-                                "Animal"
-                            ]
+                            "type": "object",
+                            "properties": {
+                                "animals": {
+                                    "type": "array",
+                                    "items": [
+                                        {"extends": "Animal"},
+                                        {"extends": "Animal"},
+                                        {"extends": "Animal"}
+                                    ]
+                                }
+                            }
                         }
                     }   
                 }
@@ -57,16 +69,18 @@
         {
             "name":"Animal",
             "description": "This is an Animal",
+            "type": "object",
             "properties": {
-                "name":"string",
-                "age":"number",
-                "species": "Species"
+                "name":{"type": "string"},
+                "age": {"type": "number"},
+                "species": {"extends": "Species"}
             }   
         }, {
             "name":"Species",
-            "description": "This is an Species",
+            "description": "This is a Species",
+            "type": "object",
             "properties": {
-                "name":"string"
+                "name":{"type": "string"}
             }   
         }
     ]

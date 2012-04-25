@@ -619,13 +619,14 @@ app.dynamicHelpers({
                 jsonData.endpoints = jsonData.endpoints.map(parseEndpointsJsonSchema);
             }
             if(jsonData.jsonSchemas != null) {
-                jsonData.jsonSchemas = jsonData.jsonSchemas.map(parseJsonSchema);
+                jsonData.jsonSchemas = jsonData.jsonSchemas.map(parseSchemaStart);
             }
 
             return jsonData;
         }
     }
 })
+
 
 function parseEndpointsJsonSchema(endpoint) {
     if(endpoint.methods != null) {
@@ -636,14 +637,14 @@ function parseEndpointsJsonSchema(endpoint) {
 
 function parseMethodJsonSchema(method) {
     if(method.requestBodyJsonSchema != null) {
-        method.requestBodyJsonSchema = parseJsonSchema(method.requestBodyJsonSchema);
+        method.requestBodyJsonSchema = parseSchemaStart(method.requestBodyJsonSchema);
     }    
     if(method.responseBodyJsonSchema != null) {
-        method.responseBodyJsonSchema = parseJsonSchema(method.responseBodyJsonSchema);
+        method.responseBodyJsonSchema = parseSchemaStart(method.responseBodyJsonSchema);
     }
     return method;
 }
-
+/*
 function parseJsonSchema(jsonSchema) {
     jsonSchema.prettyString = JSON.stringify(jsonSchema.properties, addTypeAnchors, '    ');
     return jsonSchema;
@@ -654,7 +655,100 @@ function addTypeAnchors(key, value) {
     return "<a href='#jsonType-" + value + "'>" + value + "</a>";  
   }  
   return value;  
-} 
+} */
+
+var parseSchemaConfig = {
+    padString: '    '
+}
+
+function parseSchemaStart(jsonSchema) {
+    jsonSchema.prettyString = parseSchema(jsonSchema, "", 0);
+    return jsonSchema;
+}
+
+function parseSchema(jsonSchema, out, indentLevel) {
+    if(jsonSchema == null) {
+        return "null"; 
+    }
+    else if(jsonSchema.extends != null) {
+        return parseSchemaExtends(jsonSchema, out, indentLevel);
+    }
+    else if(jsonSchema.type == 'object') {
+        return parseSchemaObject(jsonSchema, out, indentLevel);
+    }
+    else if(jsonSchema.type == 'array') {
+        return parseSchemaArray(jsonSchema, out, indentLevel);
+    }
+    else {
+        return parseSchemaPrimitive(jsonSchema, out, indentLevel);
+    }
+}
+
+function parseSchemaObject(obj, out, indentLevel) {
+
+    console.log("parse object with: " + out);
+
+    out += "{";
+
+    var keys = Object.keys(obj.properties)
+    keys.forEach(function(key) {
+        var value = obj.properties[key];
+
+        console.log("value is " + JSON.stringify(value));
+
+        out += padLine(indentLevel + 1) + "\"" + key + "\":";
+        out = parseSchema(value, out, indentLevel + 1);
+        
+        if(keys.lastIndexOf(key) < keys.length) {
+            out += ",";
+        }
+    });
+
+    return out + padLine(indentLevel) + "}";
+}
+
+function parseSchemaArray(obj, out, indentLevel) {
+    out += "[";
+    obj.items.forEach(function(item) {
+        out += padLine(indentLevel + 1);
+        out = parseSchema(item, out, indentLevel + 1);
+
+        if(obj.items.lastIndexOf(item) < obj.items.length) {
+            out += ",";
+        }
+    });
+
+    return out + padLine(indentLevel) + "]";
+}
+
+function parseSchemaExtends(obj, out, indentLevel) {
+    return out + "<a href='#jsonType-" + obj.extends + "'>" + obj.extends + "</a>";  
+}
+
+function parseSchemaPrimitive(obj, out, indentLevel) {
+    return out + obj.type;
+}
+
+function isObject(jsonSchema) {
+    if(jsonSchema.type == 'object') {
+        return true;
+    }
+    if(jsonSchema.type == null && jsonSchema.properties != null) {
+        return true;
+    }
+
+    return false;
+}
+
+function padLine(indentLevel) {
+    var str = "\n";
+
+    for(var i = 0; i<indentLevel; i++) {
+       str +=  parseSchemaConfig.padString;
+    }
+
+    return str;
+}
 
 //
 // Routes

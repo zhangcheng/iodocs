@@ -613,10 +613,15 @@ app.dynamicHelpers({
     apiDefinition: function(req, res) {
         if (req.params.api) {
             var data = fs.readFileSync('public/data/' + req.params.api + '.json');
+            
             var jsonData = JSON.parse(data);
             if(jsonData.endpoints != null) {
                 jsonData.endpoints = jsonData.endpoints.map(parseEndpointsJsonSchema);
             }
+            if(jsonData.jsonSchemas != null) {
+                jsonData.jsonSchemas = jsonData.jsonSchemas.map(parseJsonSchema);
+            }
+
             return jsonData;
         }
     }
@@ -626,15 +631,15 @@ function parseEndpointsJsonSchema(endpoint) {
     if(endpoint.methods != null) {
         endpoint.methods = endpoint.methods.map(parseMethodJsonSchema);
     }
-    if(endpoint.jsonSchemas != null) {
-        endpoint.jsonSchemas = endpoint.jsonSchemas.map(parseJsonSchema);
-    }
     return endpoint;
 }
 
 function parseMethodJsonSchema(method) {
-    if(method.responseJsonSchema != null) {
-        method.responseJsonSchema = parseJsonSchema(method.responseJsonSchema);
+    if(method.requestBodyJsonSchema != null) {
+        method.requestBodyJsonSchema = parseJsonSchema(method.requestBodyJsonSchema);
+    }    
+    if(method.responseBodyJsonSchema != null) {
+        method.responseBodyJsonSchema = parseJsonSchema(method.responseBodyJsonSchema);
     }
     return method;
 }

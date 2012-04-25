@@ -10,7 +10,33 @@
                "URI":"/animals",
                "RequiresOAuth":"N",
                "parameters":[],
-               "responseJsonSchema": {
+               "responseBodyJsonSchema": {
+                    "properties": {
+                        "errors":"Errors",
+                        "meta": "Meta",
+                        "data": {
+                            "animals": [
+                                "Animal",
+                                "Animal",
+                                "Animal"
+                            ]
+                        }
+                    }   
+                }
+            },
+            {
+               "MethodName":"Animals",
+               "Synopsis":"Put an animal in the zoo ",
+               "HTTPMethod":"PUT",
+               "URI":"/animals",
+               "RequiresOAuth":"N",
+               "parameters":[],
+               "requestBodyJsonSchema": {
+                    "properties": {
+                        "animal":"Animal"
+                    }   
+                },
+               "responseBodyJsonSchema": {
                     "properties": {
                         "errors":"Errors",
                         "meta": "Meta",
@@ -24,25 +50,25 @@
                     }   
                 }
             }
-         ],
-        "jsonSchemas": [
-            {
-                "name":"Animal",
-                "description": "This is an Animal",
-                "properties": {
-                    "name":"string",
-                    "age":"number",
-                    "species": "Species"
-                }   
-            }, {
-                "name":"Species",
-                "description": "This is an Species",
-                "properties": {
-                    "name":"string"
-                }   
-            }
-        ]
+         ]
       }
-   ]
+   ],
+   "jsonSchemas": [
+        {
+            "name":"Animal",
+            "description": "This is an Animal",
+            "properties": {
+                "name":"string",
+                "age":"number",
+                "species": "Species"
+            }   
+        }, {
+            "name":"Species",
+            "description": "This is an Species",
+            "properties": {
+                "name":"string"
+            }   
+        }
+    ]
 }
 

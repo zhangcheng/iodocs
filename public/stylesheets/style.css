@@ -493,6 +493,11 @@ li {
   margin-top: 0;
 }
 
+.schematitle {
+    font-weight: bold;
+    font-style: italic;
+}
+
 .method .title {
   overflow: hidden;
   -moz-border-radius: 5px;

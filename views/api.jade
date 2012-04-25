@@ -50,7 +50,7 @@ ul
     - each endpoint in apiDefinition.endpoints
         li.endpoint
             h3.title
-                span.name=endpoint.name + ' API Methods'
+                span.name=endpoint.name
                 ul.actions
                     li.list-methods
                         a(href='#') List Methods
@@ -76,9 +76,13 @@ ul
 
                             span.description #{method.Synopsis}
 
-                            - if (method.responseJsonSchema)
-                                h4 Response Schema
-                                pre.prettyprint!=method.responseJsonSchema.prettyString
+                            - if (method.requestBodyJsonSchema)
+                                h4 Request Body Schema
+                                pre.prettyprint!=method.requestBodyJsonSchema.prettyString
+
+                            - if (method.responseBodyJsonSchema)
+                                h4 Response Body Schema
+                                pre.prettyprint!=method.responseBodyJsonSchema.prettyString
 
                             br
                             br
@@ -155,14 +159,16 @@ ul
                             - if (!method['read-only'])
                                 input(type='submit', id=method.MethodName, value='Try it!')
 
-                - if (endpoint.jsonSchemas)
-                    h4.title
-                        span.name=endpoint.name + ' Object Schemas'
-                    - each jsonSchema in endpoint.jsonSchemas
-                        li.method.get
-                            a(name='jsonType-' + jsonSchema.name)
-                            div.title
-                                span.name=jsonSchema.name
-                            div.description=jsonSchema.description
-                            pre.prettyprint!=jsonSchema.prettyString
+            - if (apiDefinition.jsonSchemas)
+                li.endpoint.expanded
+                    h3.title
+                        span.name.schematitle='Object Schemas'
+                    ul
+                        - each jsonSchema in apiDefinition.jsonSchemas
+                            li.method.get
+                                a(name='jsonType-' + jsonSchema.name)
+                                div.title
+                                    span.name=jsonSchema.name
+                                div.description=jsonSchema.description
+                                pre.prettyprint!=jsonSchema.prettyString
 

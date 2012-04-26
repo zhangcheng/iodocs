@@ -658,7 +658,8 @@ function addTypeAnchors(key, value) {
 } */
 
 var schemaConfig = {
-    padString: '    '
+    padString: '    ',
+    numOfItemsInArray: 3
 }
 
 function printSchemaStart(jsonSchema) {
@@ -712,6 +713,27 @@ function printSchemaObject(obj, indentLevel) {
 function printSchemaArray(obj, indentLevel, field, quoteChar) {
     var items = obj[field];
     var out = "[";
+
+    for(var i=0; i<schemaConfig.numOfItemsInArray; i++) {
+        out += padLine(indentLevel + 1)
+        out += printSchema(obj.items, indentLevel + 1)
+
+        if(i<schemaConfig.numOfItemsInArray-1) {
+            out += ",";
+        }
+    }
+
+    return out + padLine(indentLevel) + "]";
+}
+
+function printSchemaExtends(obj, indentLevel) {
+    return "<a href='#jsonType-" + obj.extends + "'>" + obj.extends + "</a>";  
+}
+
+function printSchemaEnum(obj, indentLevel) {
+    var quoteChar = (obj.type == "string")? "\"": null; 
+    var items = obj.enum;
+    var out = "enum[";
     items.forEach(function(item) {
         out += padLine(indentLevel + 1);
 
@@ -731,15 +753,7 @@ function printSchemaArray(obj, indentLevel, field, quoteChar) {
     });
 
     return out + padLine(indentLevel) + "]";
-}
 
-function printSchemaExtends(obj, indentLevel) {
-    return "<a href='#jsonType-" + obj.extends + "'>" + obj.extends + "</a>";  
-}
-
-function printSchemaEnum(obj, indentLevel) {
-    var quoteChar = (obj.type == "string")? "\"": null; 
-    return "enum" + printSchemaArray(obj, indentLevel, 'enum', quoteChar);
 }
 
 function printSchemaPrimitive(obj, indentLevel) {

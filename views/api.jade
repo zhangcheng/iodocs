@@ -159,16 +159,16 @@ ul
                             - if (!method['read-only'])
                                 input(type='submit', id=method.MethodName, value='Try it!')
 
-            - if (apiDefinition.jsonSchemas)
-                li.endpoint.expanded
-                    h3.title
-                        span.name.schematitle='Object Schemas'
-                    ul
-                        - each jsonSchema in apiDefinition.jsonSchemas
-                            li.method.get
-                                a(name='jsonType-' + jsonSchema.name)
-                                div.title
-                                    span.name=jsonSchema.name
-                                div.description=jsonSchema.description
-                                pre.prettyprint!=jsonSchema.prettyString
+    - if (apiDefinition.jsonSchemas)
+        li.endpoint.expanded
+            h3.title
+                span.name.schematitle='Object Schemas'
+            ul
+                - each jsonSchema in apiDefinition.jsonSchemas
+                    li.method.get
+                        a(name='jsonType-' + jsonSchema.name)
+                        div.title
+                            span.name=jsonSchema.name
+                        div.description!=jsonSchema.description
+                        pre.prettyprint!=jsonSchema.prettyString
 

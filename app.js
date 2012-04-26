@@ -619,7 +619,7 @@ app.dynamicHelpers({
                 jsonData.endpoints = jsonData.endpoints.map(parseEndpointsJsonSchema);
             }
             if(jsonData.jsonSchemas != null) {
-                jsonData.jsonSchemas = jsonData.jsonSchemas.map(parseSchemaStart);
+                jsonData.jsonSchemas = jsonData.jsonSchemas.map(printSchemaStart);
             }
 
             return jsonData;
@@ -637,10 +637,10 @@ function parseEndpointsJsonSchema(endpoint) {
 
 function parseMethodJsonSchema(method) {
     if(method.requestBodyJsonSchema != null) {
-        method.requestBodyJsonSchema = parseSchemaStart(method.requestBodyJsonSchema);
+        method.requestBodyJsonSchema = printSchemaStart(method.requestBodyJsonSchema);
     }    
     if(method.responseBodyJsonSchema != null) {
-        method.responseBodyJsonSchema = parseSchemaStart(method.responseBodyJsonSchema);
+        method.responseBodyJsonSchema = printSchemaStart(method.responseBodyJsonSchema);
     }
     return method;
 }
@@ -657,47 +657,49 @@ function addTypeAnchors(key, value) {
   return value;  
 } */
 
-var parseSchemaConfig = {
+var schemaConfig = {
     padString: '    '
 }
 
-function parseSchemaStart(jsonSchema) {
-    jsonSchema.prettyString = parseSchema(jsonSchema, "", 0);
+function printSchemaStart(jsonSchema) {
+    jsonSchema.prettyString = printSchema(jsonSchema, 0);
     return jsonSchema;
 }
 
-function parseSchema(jsonSchema, out, indentLevel) {
+function printSchema(jsonSchema, indentLevel) {
     if(jsonSchema == null) {
         return "null"; 
     }
     else if(jsonSchema.extends != null) {
-        return parseSchemaExtends(jsonSchema, out, indentLevel);
+        return printSchemaExtends(jsonSchema, indentLevel);
     }
-    else if(jsonSchema.type == 'object') {
-        return parseSchemaObject(jsonSchema, out, indentLevel);
+    else if(jsonSchema.enum != null) {
+        return printSchemaEnum(jsonSchema, indentLevel);
     }
-    else if(jsonSchema.type == 'array') {
-        return parseSchemaArray(jsonSchema, out, indentLevel);
+    else if(isSchemaObject(jsonSchema)) {
+        return printSchemaObject(jsonSchema, indentLevel);
+    }
+    else if(isSchemaArray(jsonSchema)) {
+        return printSchemaArray(jsonSchema, indentLevel, 'items', null);
     }
     else {
-        return parseSchemaPrimitive(jsonSchema, out, indentLevel);
+        return printSchemaPrimitive(jsonSchema, indentLevel);
     }
 }
 
-function parseSchemaObject(obj, out, indentLevel) {
+function printSchemaObject(obj, indentLevel) {
 
-    console.log("parse object with: " + out);
+    console.log(JSON.stringify(obj))
+    console.log(indentLevel);
 
-    out += "{";
+    var out = "{";
 
     var keys = Object.keys(obj.properties)
     keys.forEach(function(key) {
         var value = obj.properties[key];
 
-        console.log("value is " + JSON.stringify(value));
-
-        out += padLine(indentLevel + 1) + "\"" + key + "\":";
-        out = parseSchema(value, out, indentLevel + 1);
+        out += padLine(indentLevel + 1) + "\"" + key + "\": ";
+        out += printSchema(value, indentLevel + 1);
         
         if(keys.lastIndexOf(key) < keys.length) {
             out += ",";
@@ -707,13 +709,23 @@ function parseSchemaObject(obj, out, indentLevel) {
     return out + padLine(indentLevel) + "}";
 }
 
-function parseSchemaArray(obj, out, indentLevel) {
-    out += "[";
-    obj.items.forEach(function(item) {
+function printSchemaArray(obj, indentLevel, field, quoteChar) {
+    var items = obj[field];
+    var out = "[";
+    items.forEach(function(item) {
         out += padLine(indentLevel + 1);
-        out = parseSchema(item, out, indentLevel + 1);
 
-        if(obj.items.lastIndexOf(item) < obj.items.length) {
+        if(quoteChar != null) {
+            out += quoteChar;
+        }
+
+        out += printSchema(item, indentLevel + 1);
+
+        if(quoteChar != null) {
+            out += quoteChar;
+        }
+
+        if(items.lastIndexOf(item) < items.length) {
             out += ",";
         }
     });
@@ -721,19 +733,35 @@ function parseSchemaArray(obj, out, indentLevel) {
     return out + padLine(indentLevel) + "]";
 }
 
-function parseSchemaExtends(obj, out, indentLevel) {
-    return out + "<a href='#jsonType-" + obj.extends + "'>" + obj.extends + "</a>";  
+function printSchemaExtends(obj, indentLevel) {
+    return "<a href='#jsonType-" + obj.extends + "'>" + obj.extends + "</a>";  
 }
 
-function parseSchemaPrimitive(obj, out, indentLevel) {
-    return out + obj.type;
+function printSchemaEnum(obj, indentLevel) {
+    var quoteChar = (obj.type == "string")? "\"": null; 
+    return "enum" + printSchemaArray(obj, indentLevel, 'enum', quoteChar);
 }
 
-function isObject(jsonSchema) {
+function printSchemaPrimitive(obj, indentLevel) {
+    return (obj.type != null)? obj.type: obj;
+}
+
+function isSchemaObject(jsonSchema) {
     if(jsonSchema.type == 'object') {
         return true;
     }
-    if(jsonSchema.type == null && jsonSchema.properties != null) {
+    if(jsonSchema.type == undefined && jsonSchema.properties != null) {
+        return true;
+    }
+
+    return false;
+}
+
+function isSchemaArray(jsonSchema) {
+    if(jsonSchema.type == 'array') {
+        return true;
+    }
+    if(jsonSchema.type == undefined && jsonSchema.items != null) {
         return true;
     }
 
@@ -744,7 +772,7 @@ function padLine(indentLevel) {
     var str = "\n";
 
     for(var i = 0; i<indentLevel; i++) {
-       str +=  parseSchemaConfig.padString;
+       str +=  schemaConfig.padString;
     }
 
     return str;

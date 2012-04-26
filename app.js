@@ -702,7 +702,7 @@ function printSchemaObject(obj, indentLevel) {
         out += padLine(indentLevel + 1) + "\"" + key + "\": ";
         out += printSchema(value, indentLevel + 1);
         
-        if(keys.lastIndexOf(key) < keys.length) {
+        if(keys.lastIndexOf(key) < keys.length-1) {
             out += ",";
         }
     });

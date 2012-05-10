@@ -1,8 +1,17 @@
 {
-    "anobii": {
-        "name": "Anobii API",
+    "anobii-i": {
+        "name": "Anobii API Integration",
         "protocol": "http",
         "baseURL": "v2api-integration.ldn.anobii.com",
+        "publicPath": "/v1",
+        "plugin": "anobii.js",
+        "auth": "key",
+        "signature":"true"
+    },
+    "anobii-l": {
+        "name": "Anobii API Localhost",
+        "protocol": "http",
+        "baseURL": "api.anobii.local",
         "publicPath": "/v1",
         "plugin": "anobii.js",
         "auth": "key",

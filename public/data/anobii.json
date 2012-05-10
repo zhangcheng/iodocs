@@ -207,9 +207,6 @@
                     "RequiresOAuth": "N",
                     "Synopsis": "Login as a site user",
                     "URI": "/person/login",
-                    "headers": {
-                        "Content-Type": "application/json"
-                    },
                     "parameters": [
                         {
                             "Default": "anobii@mailinator.com",
@@ -421,6 +418,174 @@
                         }
                     ]
                 }
+            ]
+        },
+        {
+            "name": "Purchases/Payments",
+            "methods": [
+                {
+                    "HTTPMethod": "POST",
+                    "MethodName": "Create basket",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Creates a new order/basket",
+                    "URI": "/payment",
+                    "parameters": [
+                        {
+                            "Name": "currency",
+                            "Type":    "string",
+                            "Pattern": "[A-Za-z]{3}",
+                            "Required": "Y",
+                            "Description": "Currency of order"
+                        },
+                        {
+                            "Name": "country",
+                            "Type": "string",
+                            "Pattern": "[A-Za-z]{2}",
+                            "Required": "Y",
+                            "Description": "Country of order"
+                        },
+                        {
+                            "Description": "Editions to populate the order/basket with",
+                            "Name": "items",
+                            "Required": "N",
+                            "Type": "string[]"
+                        }
+                    ]
+                },
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "Get basket",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Get an order/basket",
+                    "URI": "/payment/:reference",
+                    "parameters": [
+                        {
+                            "Name": "reference",
+                            "Type":    "string",
+                            "Required": "Y",
+                            "Description": "Order id/reference"
+                        }
+                    ]
+                },
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "Notify (Adyen Only)",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Notifies the API about the payment status of an order",
+                    "URI": "/payment/:reference/notify",
+                    "parameters": [
+                        {
+                            "Name": "reference",
+                            "Type": "string",
+                            "Pattern": "ADYEN[A-Za-z0-9]+",
+                            "Required": "Y",
+                            "Description": "Order id/reference"
+                        },
+                        {
+                            "Name": "live",
+                            "Type": "boolean",
+                            "Required": "Y",
+                            "Description": "Indicates whether the notification originated from a live or test server"
+                        },
+                        {
+                            "Name": "eventCode",
+                            "Type": "enumerated",
+                            "EnumeratedList": [
+                                "AUTHORISATION",
+                                "CANCELLATION",
+                                "REFUND",
+                                "CANCEL_OR_REFUND",
+                                "CAPTURE",
+                                "REFUNDED_REVERSED",
+                                "REQUEST_FOR_INFORMATION",
+                                "NOTIFICATION_OF_CHARGEBACK",
+                                "ADVICE_OF_DEBIT",
+                                "CHARGEBACK",
+                                "CHARGEBACK_REVERSED",
+                                "REPORT_AVAILABLE"
+                            ],
+                            "Required": "Y",
+                            "Description": "Type of event"
+                        },
+                        {
+                            "Name": "pspReference",
+                            "Type": "string",
+                            "Required": "Y",
+                            "Description": "Reference assigned by Adyen to payment",
+                            "Default": "testnotification_NOTIFICATIONTEST"
+                        },
+                        {
+                            "Name": "originalReference",
+                            "Type": "string",
+                            "Required": "Y",
+                            "Description": "Original reference assigned by Adyen to payment (blank for payments)",
+                            "Default": ""
+                        },
+                        {
+                            "Name": "merchantReference",
+                            "Type": "string",
+                            "Pattern": "ADYEN[A-Za-z0-9]+",
+                            "Required": "Y",
+                            "Description": "Our reference (order id)"
+                        },
+                        {
+                            "Name": "merchantAccountCode",
+                            "Type": "string",
+                            "Required": "Y",
+                            "Description": "Adyen merchant account code",
+                            "Default": ""
+                        },
+                        {
+                            "Name": "eventDate",
+                            "Type": "string",
+                            "Required": "Y",
+                            "Description": "The time the event was generated"
+                        },
+                        {
+                            "Name": "success",
+                            "Type": "boolean",
+                            "Required": "Y",
+                            "Description": "Indicates whether the event succeeded"
+                        },
+                        {
+                            "Name": "paymentMethod",
+                            "Type": "string",
+                            "Required": "N",
+                            "Description": "Method with which payment was made (only for AUTHORISATION)"
+                        },
+                        {
+                            "Name": "operations",
+                            "Type": "enumerated[]",
+                            "Required": "N",
+                            "EnumeratedList": [
+                                "CAPTURE",
+                                "REFUND",
+                                "CANCEL"
+                            ],
+                            "Description": "Modification operations dupported by this payment (only for AUTHORISATION)"
+                        },
+                        {
+                            "Name": "reason",
+                            "Type": "string",
+                            "Required": "Y",
+                            "Description": "For successful AUTHORISATION it contains: \"AUTHCODE:LAST4DIGITS:EXPIRYDATE\".\nFor unsuccessful AUTHORISATION, it provides the reason for failure.\nFor REPORT_AVAILABLE it provides a url from which the report can be downloaded"
+                        },
+                        {
+                            "Name": "amount[currencyCode]",
+                            "Type": "string",
+                            "Pattern": "[A-Z]{3}",
+                            "Description": "Currency of payment",
+                            "Default": "GBP"
+                        },
+                        {
+                            "Name": "amount[value]",
+                            "Type": "number",
+                            "Description": "Amount of payment in minor units",
+                            "Default": "10000"
+                        }
+                    ]
+                }
+
             ]
         }
     ]

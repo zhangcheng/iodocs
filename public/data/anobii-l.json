@@ -505,6 +505,14 @@
                     ]
                 },
                 {
+                    "HTTPMethod": "GET",
+                    "MethodName": "Get my basket",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Get an order/basket",
+                    "URI": "/payment/my",
+                    "parameters": []
+                },
+                {
                     "HTTPMethod": "POST",
                     "MethodName": "Notify (Adyen Only)",
                     "RequiresOAuth": "N",

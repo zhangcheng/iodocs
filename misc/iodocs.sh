@@ -21,7 +21,7 @@ do_start()
 {
         if [ ! -f "$LOCK_FILE" ] ; then
                 echo -n $"Starting $SERVER: "
-                runuser -l "$USER" -c "$DAEMON $SERVER >> $LOG_FILE &" && echo_success || echo_failure
+                runuser -l "$USER" -c "cd $ROOT_DIR; $DAEMON $SERVER >> $LOG_FILE &" && echo_success || echo_failure)
                 RETVAL=$?
                 echo
                 [ $RETVAL -eq 0 ] && touch $LOCK_FILE
@@ -37,7 +37,7 @@ do_stop()
         kill -9 $pid > /dev/null 2>&1 && echo_success || echo_failure
         RETVAL=$?
         echo
-        [ $RETVAL -eq 0 ] && rm -f $LOCK_FILE
+        [ $RETVAL -eq 0 ]# && rm -f $LOCK_FILE
 }
 
 case "$1" in

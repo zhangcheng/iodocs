@@ -288,4 +288,25 @@
         })
     })
 
+
+    $('.copy-field').live('click',function(){
+        var curr = $(this).parents('td.parameter').parent('tr');
+        var clone = curr.clone();
+        $('input', clone).val('');
+        curr.after(clone);
+        $(this).text('-').removeClass('copy-field').addClass('remove-field');
+        return false;
+    });
+
+    $('.remove-field').live('click',function(){
+         $(this).parents('td.parameter').parent('tr').remove();
+         return false;
+     });
+
+     $('.credentials input').change(function(){
+         window.sessionStorage.setItem('credentials-' + $(this).attr('name'), $(this).val());
+     }).each(function(){
+         $(this).val(window.sessionStorage.getItem('credentials-' + $(this).attr('name') || ''));
+     });
+
 })();

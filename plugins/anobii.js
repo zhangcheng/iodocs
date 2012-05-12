@@ -20,10 +20,15 @@ AnobiiAPI.prototype = {
             return undefined;
         }
 
+        if (url.substr(-1) == '?') {
+            url = url.slice(0, -1);
+        }
+
         var time = this._getTime(),
             nonce = this._getNonce(),
             base = sprintf('%s %s %s %d %s', method, url, this.sessionId, time, nonce),
             sig = crypto.createHmac('sha1', this.apiSecret).update(base).digest('hex');
+
         return sprintf('%s %s %s %d %s %s', 'Anobiiv1', this.apiKey, this.sessionId, time, nonce, sig);
 
     },

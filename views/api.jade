@@ -99,8 +99,14 @@ ul
                                               tr(class=className)
                                                   td.name=parameter.Name
                                                   td.parameter
+                                                      - var paramName = 'params[' + parameter.Name + ']'
+                                                      - var isArray = false
+                                                      - if (parameter.Type.substr(-2) == '[]')
+                                                          - paramName = 'params[' + parameter.Name + '][]'
+                                                          - parameter.Type = parameter.Type.slice(0, -2)
+                                                          - isArray = true
                                                       - if (parameter.Type =='enumerated')
-                                                          select(name='params[' + parameter.Name + ']', placeholder=className)
+                                                          select(name=paramName, placeholder=className)
                                                             - if (parameter.Default =='')
                                                                 option(value='')
                                                             - each choice in parameter.EnumeratedList
@@ -109,20 +115,22 @@ ul
                                                                 - else
                                                                         option(value=choice) #{choice}
                                                       - else if (parameter.Type =='boolean')
-                                                           select(name='params[' + parameter.Name + ']', placeholder=className)
+                                                           select(name=paramName, placeholder=className)
                                                                 - if (parameter.Default =='')
                                                                         option(value='')
-                                                                - each choice in [apiInfo.booleanTrueVal,apiInfo.booleanFalseVal]
+                                                                - each choice in [apiInfo.booleanTrueVal || "true",apiInfo.booleanFalseVal || "false"]
                                                                    - if (parameter.Default ==choice)
                                                                            option(value=choice, selected=true) #{choice}
                                                                    - else
                                                                            option(value=choice) #{choice}
                                                       - else
-                                                          input(name='params[' + parameter.Name + ']', value=parameter.Default,
+                                                          input(name=paramName, value=parameter.Default,
                                                           placeholder=className,
                                                           pattern=parameter.Pattern,
                                                           title=parameter.Type
                                                           )
+                                                      - if (isArray)
+                                                          a(href='#', class='copy-field') +
                                                   td.type=parameter.Type
                                                   td.description=parameter.Description || 'No description'
                             - if (method.headers)

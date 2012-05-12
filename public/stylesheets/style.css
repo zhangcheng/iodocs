@@ -7,6 +7,7 @@ th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgr
   font-size: 100%;
   font: inherit;
   vertical-align: baseline;
+  position: relative;
 }
 
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
@@ -748,6 +749,26 @@ li {
 
 .clearfix {
   zoom: 1;
+}
+
+a.copy-field, a.remove-field {
+    text-decoration: none;
+    margin: 0 0 0 5px;
+    height: 16px;
+    border: 2px solid white;
+    width: 16px;
+    display: inline-block;
+    text-align: center;
+    border-radius: 100%;
+    vertical-align: middle;
+    line-height: 13px;
+    background-color: black;
+    color: white;
+    box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.75);
+}
+
+a.remove-field {
+    line-height: 15px;
 }
 
 @media print {

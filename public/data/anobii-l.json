@@ -249,7 +249,7 @@
                             "Name": "edition[id",
                             "Required": "Y",
                             "Type": "integer",
-			    "Pattern": "[0-9]+"
+                "Pattern": "[0-9]+"
                         },
                         {
                             "Default": "",
@@ -257,7 +257,7 @@
                             "Name": "person[id",
                             "Required": "Y",
                             "Type": "integer",
-			    "Pattern": "[0-9]+"
+                "Pattern": "[0-9]+"
                         }
                     ]
                 }
@@ -472,14 +472,16 @@
                             "Type":    "string",
                             "Pattern": "[A-Za-z]{3}",
                             "Required": "Y",
-                            "Description": "Currency of order"
+                            "Description": "Currency of order",
+                            "Default":"GBP"
                         },
                         {
                             "Name": "country",
                             "Type": "string",
                             "Pattern": "[A-Za-z]{2}",
                             "Required": "Y",
-                            "Description": "Country of order"
+                            "Description": "Country of order",
+                            "Default": "GB"
                         },
                         {
                             "Description": "Editions to populate the order/basket with",
@@ -627,6 +629,37 @@
                             "Type": "number",
                             "Description": "Amount of payment in minor units",
                             "Default": "10000"
+                        }
+                    ]
+                }
+                ,
+                {
+                    "HTTPMethod": "POST",
+                    "MethodName": "Update basket",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Add or remove editions to the basket",
+                    "URI": "/payment/:reference",
+                    "parameters": [
+                        {
+                            "Name": "reference",
+                            "Description": "Reference of order",
+                            "Type":"string",
+                            "Pattern":"ADYEN[A-Za-z0-9]+",
+                            "Required":"Y"
+                        },
+                        {
+                            "Name":"additions",
+                            "Description":"Editions to add",
+                            "Type":"number[]",
+                            "Pattern":"[0-9]+",
+                            "Required":"N"
+                        },
+                        {
+                            "Name":"deletions",
+                            "Description":"Editions to remove",
+                            "Type":"number[]",
+                            "Pattern":"[0-9]+",
+                            "Required":"N"
                         }
                     ]
                 }

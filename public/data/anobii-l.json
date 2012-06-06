@@ -465,7 +465,7 @@
                     "MethodName": "Create basket",
                     "RequiresOAuth": "N",
                     "Synopsis": "Creates a new order/basket",
-                    "URI": "/payment",
+                    "URI": "/basket",
                     "parameters": [
                         {
                             "Name": "currency",
@@ -496,7 +496,7 @@
                     "MethodName": "Get basket",
                     "RequiresOAuth": "N",
                     "Synopsis": "Get an order/basket",
-                    "URI": "/payment/:reference",
+                    "URI": "/basket/:reference",
                     "parameters": [
                         {
                             "Name": "reference",
@@ -519,12 +519,12 @@
                     "MethodName": "Notify (Adyen Only)",
                     "RequiresOAuth": "N",
                     "Synopsis": "Notifies the API about the payment status of an order",
-                    "URI": "/payment/:reference/checkout",
+                    "URI": "/checkout/:reference",
                     "parameters": [
                         {
                             "Name": "reference",
                             "Type": "string",
-                            "Pattern": "ADYEN[A-Za-z0-9]+",
+                            "Pattern": "ADYEN:.*",
                             "Required": "Y",
                             "Description": "Order id/reference"
                         },
@@ -571,7 +571,7 @@
                         {
                             "Name": "merchantReference",
                             "Type": "string",
-                            "Pattern": "ADYEN[A-Za-z0-9]+",
+                            "Pattern": "ADYEN:.*",
                             "Required": "Y",
                             "Description": "Our reference (order id)"
                         },
@@ -638,7 +638,7 @@
                     "MethodName": "Update basket",
                     "RequiresOAuth": "N",
                     "Synopsis": "Add or remove editions to the basket",
-                    "URI": "/payment/:reference",
+                    "URI": "/basket/:reference",
                     "parameters": [
                         {
                             "Name": "reference",
@@ -663,7 +663,23 @@
                         }
                     ]
                 }
-
+                ,
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "Get baskets for person",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Get the baskets for a particular individual",
+                    "URI": "/basket",
+                    "parameters": [
+                        {
+                            "Name": "person",
+                            "Description": "Person id",
+                            "Type":"integer or NULL",
+                            "Pattern":"[0-9]+|NULL",
+                            "Required":"Y"
+                        }
+                    ]
+                }
             ]
         }
     ]

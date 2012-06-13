@@ -458,15 +458,24 @@
             ]
         },
         {
-            "name": "Purchases/Payments",
+            "name": "Baskets",
             "methods": [
                 {
                     "HTTPMethod": "POST",
-                    "MethodName": "Create basket",
+                    "MethodName": "Create",
                     "RequiresOAuth": "N",
                     "Synopsis": "Creates a new order/basket",
-                    "URI": "/basket",
+                    "URI": "/:service",
                     "parameters": [
+                        {
+                            "Name": "service",
+                            "Type": "enumerated",
+                            "Required": "Y",
+                            "EnumeratedList": [
+                                "basket",
+                                "single-basket"
+                            ]
+                        },
                         {
                             "Name": "currency",
                             "Type":    "string",
@@ -496,8 +505,17 @@
                     "MethodName": "Get basket",
                     "RequiresOAuth": "N",
                     "Synopsis": "Get an order/basket",
-                    "URI": "/basket/:reference",
+                    "URI": "/:service/:reference",
                     "parameters": [
+                        {
+                            "Name": "service",
+                            "Type": "enumerated",
+                            "Required": "Y",
+                            "EnumeratedList": [
+                                "basket",
+                                "single-basket"
+                            ]
+                        },
                         {
                             "Name": "reference",
                             "Type":    "string",
@@ -515,6 +533,77 @@
                     "parameters": []
                 },
                 {
+                    "HTTPMethod": "POST",
+                    "MethodName": "Update basket",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Add or remove editions to the basket",
+                    "URI": "/:service/:reference",
+                    "parameters": [
+                        {
+                            "Name": "service",
+                            "Type": "enumerated",
+                            "Required": "Y",
+                            "EnumeratedList": [
+                                "basket",
+                                "single-basket"
+                            ]
+                        },
+                        {
+                            "Name": "reference",
+                            "Description": "Reference of order",
+                            "Type":"string",
+                            "Pattern":"ADYEN:(?:[0-9]+|NULL):.*",
+                            "Required":"Y"
+                        },
+                        {
+                            "Name":"additions",
+                            "Description":"Editions to add",
+                            "Type":"number[]",
+                            "Pattern":"[0-9]+",
+                            "Required":"N"
+                        },
+                        {
+                            "Name":"deletions",
+                            "Description":"Editions to remove",
+                            "Type":"number[]",
+                            "Pattern":"[0-9]+",
+                            "Required":"N"
+                        }
+                    ]
+                }
+                ,
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "Get baskets for person",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Get the baskets for a particular individual",
+                    "URI": "/:service",
+                    "parameters": [
+                        {
+                            "Name": "service",
+                            "Type": "enumerated",
+                            "Required": "Y",
+                            "EnumeratedList": [
+                                "basket",
+                                "single-basket"
+                            ]
+                        },
+                        {
+                            "Name": "person",
+                            "Description": "Person id",
+                            "Type":"integer or NULL",
+                            "Pattern":"[0-9]+|NULL",
+                            "Required":"Y"
+                        }
+                    ]
+                }
+            ]
+        }
+        ,
+        {
+            "name": "Checkout",
+            "methods": [
+            {
                     "HTTPMethod": "POST",
                     "MethodName": "Notify (Adyen Only)",
                     "RequiresOAuth": "N",
@@ -629,54 +718,6 @@
                             "Type": "number",
                             "Description": "Amount of payment in minor units",
                             "Default": "10000"
-                        }
-                    ]
-                }
-                ,
-                {
-                    "HTTPMethod": "POST",
-                    "MethodName": "Update basket",
-                    "RequiresOAuth": "N",
-                    "Synopsis": "Add or remove editions to the basket",
-                    "URI": "/basket/:reference",
-                    "parameters": [
-                        {
-                            "Name": "reference",
-                            "Description": "Reference of order",
-                            "Type":"string",
-                            "Pattern":"ADYEN:(?:[0-9]+|NULL):.*",
-                            "Required":"Y"
-                        },
-                        {
-                            "Name":"additions",
-                            "Description":"Editions to add",
-                            "Type":"number[]",
-                            "Pattern":"[0-9]+",
-                            "Required":"N"
-                        },
-                        {
-                            "Name":"deletions",
-                            "Description":"Editions to remove",
-                            "Type":"number[]",
-                            "Pattern":"[0-9]+",
-                            "Required":"N"
-                        }
-                    ]
-                }
-                ,
-                {
-                    "HTTPMethod": "GET",
-                    "MethodName": "Get baskets for person",
-                    "RequiresOAuth": "N",
-                    "Synopsis": "Get the baskets for a particular individual",
-                    "URI": "/basket",
-                    "parameters": [
-                        {
-                            "Name": "person",
-                            "Description": "Person id",
-                            "Type":"integer or NULL",
-                            "Pattern":"[0-9]+|NULL",
-                            "Required":"Y"
                         }
                     ]
                 }

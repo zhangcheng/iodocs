@@ -644,7 +644,7 @@
                             "Name": "reference",
                             "Description": "Reference of order",
                             "Type":"string",
-                            "Pattern":"ADYEN[A-Za-z0-9]+",
+                            "Pattern":"ADYEN:(?:[0-9]+|NULL):.*",
                             "Required":"Y"
                         },
                         {
@@ -677,6 +677,123 @@
                             "Type":"integer or NULL",
                             "Pattern":"[0-9]+|NULL",
                             "Required":"Y"
+                        }
+                    ]
+                }
+            ]
+        }
+        ,
+        {
+            "name": "Dispute",
+            "methods": [
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "List disputes",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Lists all the disputes by order",
+                    "URI": "/dispute",
+                    "parameters": [
+                        {
+                            "Name": "order",
+                            "Type": "integer",
+                            "Pattern": "[0-9]+",
+                            "Required": "Y",
+                            "Description": "Order id"
+                        },
+                        {
+                            "Description": "The direction in which to order the results",
+                            "EnumeratedList": [
+                                "default",
+                                "asc",
+                                "desc"
+                            ],
+                            "Name": "direction",
+                            "Required": "N",
+                            "Type": "enumerated"
+                        },
+                        {
+                            "Description": "Which page to return",
+                            "Name": "page",
+                            "Pattern": "[0-9]+",
+                            "Required": "N",
+                            "Type": "integer"
+                        },
+                        {
+                            "Description": "How many results to return (0-100)",
+                            "Name": "rows",
+                            "Pattern": "(?:100|[0-9]{0,2})",
+                            "Required": "N",
+                            "Type": "integer"
+                        }
+                    ]
+                }
+            ]
+        }
+        ,
+        {
+            "name": "Order",
+            "methods": [
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "Get an order",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Gets an order by reference",
+                    "URI": "/order",
+                    "parameters": [
+                        {
+                            "Name": "reference",
+                            "Type": "string",
+                            "Pattern": "ADYEN:.*",
+                            "Required": "Y",
+                            "Description": "Order reference"
+                        }
+                    ]
+                },
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "Get an order",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Gets an order by id",
+                    "URI": "/order/:id",
+                    "parameters": [
+                        {
+                            "Name": "id",
+                            "Type": "integer",
+                            "Pattern": "[0-9]+",
+                            "Required": "Y",
+                            "Description": "Order id"
+                        }
+                    ]
+                },
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "get a user's orders",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Gets the orders of a user",
+                    "URI": "/order",
+                    "parameters": [
+                        {
+                            "Name": "person",
+                            "Type": "integer",
+                            "Pattern": "[0-9]+",
+                            "Required": "Y",
+                            "Description": "Person id"
+                        }
+                    ]
+                },
+                {
+                    "HTTPMethod": "GET",
+                    "MethodName": "Order contents",
+                    "RequiresOAuth": "N",
+                    "Synopsis": "Gets the orders of a user",
+                    "URI": "/edition",
+                    "parameters": [
+                        {
+                            "Name": "order",
+                            "Type": "integer",
+                            "Pattern": "[0-9]+",
+                            "Required": "Y",
+                            "Description": "order id"
                         }
                     ]
                 }

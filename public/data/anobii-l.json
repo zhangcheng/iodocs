@@ -784,9 +784,14 @@
                         {
                             "Name": "reference",
                             "Type": "string",
-                            "Pattern": "ADYEN:.*",
                             "Required": "Y",
                             "Description": "Order reference"
+                        },
+                        {
+                            "Name": "exact",
+                            "Type": "boolean",
+                            "Required": "N",
+                            "Description": "Exact match"
                         }
                     ]
                 },
@@ -808,7 +813,7 @@
                 },
                 {
                     "HTTPMethod": "GET",
-                    "MethodName": "get a user's orders",
+                    "MethodName": "Get a user's orders",
                     "RequiresOAuth": "N",
                     "Synopsis": "Gets the orders of a user",
                     "URI": "/order",

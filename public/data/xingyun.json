@@ -1,0 +1,78 @@
+{
+  "endpoints": [
+    {
+      "name": "User",
+      "methods": [
+        {
+          "MethodName": "getCurrentUser",
+          "Synopsis": "获取当前用户信息",
+          "HTTPMethod": "GET",
+          "URI": "/me",
+          "RequiresOAuth": "N",
+          "parameters": [
+            {
+              "Name": "id",
+              "Description": "User id",
+              "Required": "Y",
+              "Type": "string"
+            },
+            {
+              "Name": "name",
+              "Required": "N",
+              "Type": "string"
+            },
+            {
+              "Name": "gender",
+              "Required": "Y",
+              "Type": "integer"
+            },
+            {
+              "Name": "company",
+              "Type": "string"
+            },
+            {
+              "Name": "birthday",
+              "Description": "Date string in MM/DD/YYYY format",
+              "Type": "string"
+            },
+            {
+              "Name": "location",
+              "Description": "“北京 海淀”这样的格式",
+              "Type": "string"
+            },
+            {
+              "Name": "pictures",
+              "Description": "用户头像列表",
+              "Type": "enumerated",
+              "EnumeratedList": "[url]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Info",
+      "path": "/info",
+      "methods": [
+        {
+          "MethodName": "getStarList",
+          "Synopsis": "星云人才列表",
+          "HTTPMethod": "GET",
+          "URI": "/info/stars?trade=:trade&level=:level",
+          "RequiresOAuth": "N",
+          "parameters": [
+            {
+              "Name": "data",
+              "Required": "Y",
+              "Type": "enumerated",
+              "EnumeratedList": "[star]"
+            },
+            {
+              "Name": "paging"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

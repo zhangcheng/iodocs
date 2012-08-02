@@ -59,5 +59,12 @@
              "version": "1.0",
              "crypt": "HMAC-SHA1"
         }
+    },
+    "xingyun": {
+        "name": "Xingyun",
+        "protocol": "http",
+        "baseURL": "api.xingyun.mobi",
+        "publicPath": "",
+        "auth": ""
     }
 }

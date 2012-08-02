@@ -18,6 +18,7 @@ var livedocs = (function() {
                 // If result is JSON in string format, objectify it so we can format it.
                 if (typeof data == 'string') {
                     try {
+                        data = data.substr(9);
                         data = JSON.parse(data);
                     } catch(e) {
                         console.log('Response said it was JSON, but it\'s not. :(');

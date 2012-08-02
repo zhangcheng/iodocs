@@ -31,6 +31,7 @@ var express     = require('express'),
     query       = require('querystring'),
     url         = require('url'),
     http        = require('http'),
+    https       = require('https'),
     crypto      = require('crypto'),
     redis       = require('redis'),
     RedisStore  = require('connect-redis')(express);
@@ -274,15 +275,16 @@ function processRequest(req, res, next) {
         console.log(util.inspect(req.body, null, 3));
     };
 
-    var reqQuery = req.body,
-        params = reqQuery.params || {},
-        methodURL = reqQuery.methodUri,
+    var reqQuery   = req.body,
+        params     = reqQuery.params || {},
+        methodURL  = reqQuery.methodUri,
         httpMethod = reqQuery.httpMethod,
-        apiKey = reqQuery.apiKey,
-        apiSecret = reqQuery.apiSecret,
-        apiName = reqQuery.apiName
-        apiConfig = apisConfig[apiName],
-        key = req.sessionID + ':' + apiName;
+        apiKey     = reqQuery.apiKey,
+        apiSecret  = reqQuery.apiSecret,
+        apiName    = reqQuery.apiName
+        apiConfig  = apisConfig[apiName],
+        key        = req.sessionID + ':' + apiName,
+        plugin     = apiConfig['plugin'] ? require('./plugins/' + apiConfig['plugin']) : require('./plugins/null.js');
 
     // Replace placeholders in the methodURL with matching params
     for (var param in params) {
@@ -309,14 +311,30 @@ function processRequest(req, res, next) {
     var paramString = query.stringify(params),
         privateReqURL = apiConfig.protocol + '://' + apiConfig.baseURL + apiConfig.privatePath + methodURL + ((paramString.length > 0) ? '?' + paramString : ""),
         options = {
-            headers: {},
+            headers: plugin.getHeaders(httpMethod, apiConfig.publicPath + methodURL + (httpMethod[0] != 'P' ? (methodURL.indexOf('?') == -1 ? '?' : '&') + paramString : ''), apiKey, apiSecret),
             protocol: apiConfig.protocol + ':',
             host: baseHostUrl,
             port: baseHostPort,
             method: httpMethod,
-            path: apiConfig.publicPath + methodURL + ((paramString.length > 0) ? '?' + paramString : "")
-        };
-
+            path: apiConfig.publicPath + methodURL
+        },
+        body = undefined;
+        if (apiConfig.port) {
+            options.port = apiConfig.port;
+        }
+        if (paramString) {
+            switch (httpMethod) {
+                case 'GET':
+                case 'DELETE':
+                    privateReqURL += (privateReqURL.indexOf('?') == -1 ? '?' : '&') + paramString;
+                    options.path += (options.path.indexOf('?') == -1 ? '?' : '&') + paramString;
+                    break;
+                case 'PUT':
+                case 'POST':
+                    body = plugin.getBody(params);
+                    break;
+            }
+        }
     if (apiConfig.oauth) {
         console.log('Using OAuth');
 
@@ -341,7 +359,7 @@ function processRequest(req, res, next) {
                     console.log(apiSecret);
                     console.log(accessToken);
                     console.log(accessTokenSecret);
-                    
+
                     var oa = new OAuth(apiConfig.oauth.requestURL || null,
                                        apiConfig.oauth.accessURL || null,
                                        apiKey || null,
@@ -468,11 +486,10 @@ function processRequest(req, res, next) {
         console.log('Unsecured Call');
 
         // Add API Key to params, if any.
-        if (apiKey != '' && apiKey != 'undefined' && apiKey != undefined) {
+        if (apiKey != '' && apiKey != 'undefined' && apiKey != undefined && apiConfig.keyParam) {
             if (options.path.indexOf('?') !== -1) {
                 options.path += '&';
-            }
-            else {
+            } else {
                 options.path += '?';
             }
             options.path += apiConfig.keyParam + '=' + apiKey;
@@ -511,18 +528,24 @@ function processRequest(req, res, next) {
             }
 
             options.headers = headers;
+
         }
 
         if (!options.headers['Content-Length']) {
-            options.headers['Content-Length'] = 0;
+            options.headers['Content-Length'] = body ? body.length : 0;
         }
 
         if (config.debug) {
             console.log(util.inspect(options));
         };
 
+        var protocolObj = http;
+        if ('https:' == options.protocol) {
+            protocolObj = https;
+        }
+
         // API Call. response is the response from the API, res is the response we will send back to the user.
-        var apiCall = http.request(options, function(response) {
+        var apiCall = protocolObj.request(options, function(response) {
             response.setEncoding('utf-8');
             if (config.debug) {
                 console.log('HEADERS: ' + JSON.stringify(response.headers));
@@ -559,7 +582,7 @@ function processRequest(req, res, next) {
                 req.call = url.format(req.call);
 
                 // Response body
-                req.result = body;
+                req.result = plugin.handleResponse(body);
 
                 console.log(util.inspect(body));
 
@@ -573,6 +596,10 @@ function processRequest(req, res, next) {
             };
         });
 
+        if ('P' == options.method[0]) {
+            apiCall.write(body);
+        }
+
         apiCall.end();
     }
 }
@@ -582,18 +609,18 @@ function processRequest(req, res, next) {
 app.dynamicHelpers({
     session: function(req, res) {
     // If api wasn't passed in as a parameter, check the path to see if it's there
- 	    if (!req.params.api) {
- 	    	pathName = req.url.replace('/','');
- 	    	// Is it a valid API - if there's a config file we can assume so
- 	    	fs.stat('public/data/' + pathName + '.json', function (error, stats) {
-   				if (stats) {
-   					req.params.api = pathName;
-   				}
- 			});
- 	    }       
- 	    // If the cookie says we're authed for this particular API, set the session to authed as well
+         if (!req.params.api) {
+             pathName = req.url.replace('/','');
+             // Is it a valid API - if there's a config file we can assume so
+             fs.stat('public/data/' + pathName + '.json', function (error, stats) {
+                   if (stats) {
+                       req.params.api = pathName;
+                   }
+             });
+         }
+         // If the cookie says we're authed for this particular API, set the session to authed as well
         if (req.params.api && req.session[req.params.api] && req.session[req.params.api]['authed']) {
-         	req.session['authed'] = true;
+             req.session['authed'] = true;
         }
 
         return req.session;

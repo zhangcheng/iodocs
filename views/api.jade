@@ -75,8 +75,18 @@ ul
                             input(type='hidden', name='methodUri', value=method.URI)
 
                             span.description #{method.Synopsis}
+
+                            - if (method.requestBodyJsonSchema)
+                                h4 Request Body Schema
+                                pre.prettyprint!=method.requestBodyJsonSchema.prettyString
+
+                            - if (method.responseBodyJsonSchema)
+                                h4 Response Body Schema
+                                pre.prettyprint!=method.responseBodyJsonSchema.prettyString
+
                             br
                             br
+
                             - if (method.parameters.length > 0)
                                 table.parameters
                                     thead
@@ -148,3 +158,17 @@ ul
                                     // Create header fields and button to add/remove headers.
                             - if (!method['read-only'])
                                 input(type='submit', id=method.MethodName, value='Try it!')
+
+    - if (apiDefinition.jsonSchemas)
+        li.endpoint.expanded
+            h3.title
+                span.name.schematitle='Object Schemas'
+            ul
+                - each jsonSchema in apiDefinition.jsonSchemas
+                    li.method.get
+                        a(name='jsonType-' + jsonSchema.id)
+                        div.title
+                            span.name=jsonSchema.id
+                        div.description!=jsonSchema.description
+                        pre.prettyprint!=jsonSchema.prettyString
+

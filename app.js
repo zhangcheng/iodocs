@@ -613,10 +613,184 @@ app.dynamicHelpers({
     apiDefinition: function(req, res) {
         if (req.params.api) {
             var data = fs.readFileSync('public/data/' + req.params.api + '.json');
-            return JSON.parse(data);
+            
+            var jsonData = JSON.parse(data);
+            if(jsonData.endpoints != null) {
+                jsonData.endpoints = jsonData.endpoints.map(parseEndpointsJsonSchema);
+            }
+            if(jsonData.jsonSchemas != null) {
+                jsonData.jsonSchemas = jsonData.jsonSchemas.map(printSchemaStart);
+            }
+
+            return jsonData;
         }
     }
 })
+
+
+function parseEndpointsJsonSchema(endpoint) {
+    if(endpoint.methods != null) {
+        endpoint.methods = endpoint.methods.map(parseMethodJsonSchema);
+    }
+    return endpoint;
+}
+
+function parseMethodJsonSchema(method) {
+    if(method.requestBodyJsonSchema != null) {
+        method.requestBodyJsonSchema = printSchemaStart(method.requestBodyJsonSchema);
+    }    
+    if(method.responseBodyJsonSchema != null) {
+        method.responseBodyJsonSchema = printSchemaStart(method.responseBodyJsonSchema);
+    }
+    return method;
+}
+/*
+function parseJsonSchema(jsonSchema) {
+    jsonSchema.prettyString = JSON.stringify(jsonSchema.properties, addTypeAnchors, '    ');
+    return jsonSchema;
+}
+
+function addTypeAnchors(key, value) {  
+  if (typeof(value) == "string") {
+    return "<a href='#jsonType-" + value + "'>" + value + "</a>";  
+  }  
+  return value;  
+} */
+
+var schemaConfig = {
+    padString: '    ',
+    numOfItemsInArray: 3
+}
+
+function printSchemaStart(jsonSchema) {
+    jsonSchema.prettyString = printSchema(jsonSchema, 0);
+    return jsonSchema;
+}
+
+function printSchema(jsonSchema, indentLevel) {
+    if(jsonSchema == null) {
+        return "null"; 
+    }
+    else if(jsonSchema.extends != null) {
+        return printSchemaExtends(jsonSchema, indentLevel);
+    }
+    else if(jsonSchema.enum != null) {
+        return printSchemaEnum(jsonSchema, indentLevel);
+    }
+    else if(isSchemaObject(jsonSchema)) {
+        return printSchemaObject(jsonSchema, indentLevel);
+    }
+    else if(isSchemaArray(jsonSchema)) {
+        return printSchemaArray(jsonSchema, indentLevel, 'items', null);
+    }
+    else {
+        return printSchemaPrimitive(jsonSchema, indentLevel);
+    }
+}
+
+function printSchemaObject(obj, indentLevel) {
+
+    console.log(JSON.stringify(obj))
+    console.log(indentLevel);
+
+    var out = "{";
+
+    var keys = Object.keys(obj.properties)
+    keys.forEach(function(key) {
+        var value = obj.properties[key];
+
+        out += padLine(indentLevel + 1) + "\"" + key + "\": ";
+        out += printSchema(value, indentLevel + 1);
+        
+        if(keys.lastIndexOf(key) < keys.length-1) {
+            out += ",";
+        }
+    });
+
+    return out + padLine(indentLevel) + "}";
+}
+
+function printSchemaArray(obj, indentLevel, field, quoteChar) {
+    var items = obj[field];
+    var out = "[";
+
+    for(var i=0; i<schemaConfig.numOfItemsInArray; i++) {
+        out += padLine(indentLevel + 1)
+        out += printSchema(obj.items, indentLevel + 1)
+
+        if(i<schemaConfig.numOfItemsInArray-1) {
+            out += ",";
+        }
+    }
+
+    return out + padLine(indentLevel) + "]";
+}
+
+function printSchemaExtends(obj, indentLevel) {
+    return "<a href='#jsonType-" + obj.extends + "'>" + obj.extends + "</a>";  
+}
+
+function printSchemaEnum(obj, indentLevel) {
+    var quoteChar = (obj.type == "string")? "\"": null; 
+    var items = obj.enum;
+    var out = "enum[";
+    items.forEach(function(item) {
+        out += padLine(indentLevel + 1);
+
+        if(quoteChar != null) {
+            out += quoteChar;
+        }
+
+        out += printSchema(item, indentLevel + 1);
+
+        if(quoteChar != null) {
+            out += quoteChar;
+        }
+
+        if(items.lastIndexOf(item) < items.length) {
+            out += ",";
+        }
+    });
+
+    return out + padLine(indentLevel) + "]";
+
+}
+
+function printSchemaPrimitive(obj, indentLevel) {
+    return (obj.type != null)? obj.type: obj;
+}
+
+function isSchemaObject(jsonSchema) {
+    if(jsonSchema.type == 'object') {
+        return true;
+    }
+    if(jsonSchema.type == undefined && jsonSchema.properties != null) {
+        return true;
+    }
+
+    return false;
+}
+
+function isSchemaArray(jsonSchema) {
+    if(jsonSchema.type == 'array') {
+        return true;
+    }
+    if(jsonSchema.type == undefined && jsonSchema.items != null) {
+        return true;
+    }
+
+    return false;
+}
+
+function padLine(indentLevel) {
+    var str = "\n";
+
+    for(var i = 0; i<indentLevel; i++) {
+       str +=  schemaConfig.padString;
+    }
+
+    return str;
+}
 
 //
 // Routes

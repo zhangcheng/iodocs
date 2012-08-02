@@ -23,6 +23,14 @@
          "auth": "key",
          "keyParam": "api_key"
     },
+    "zoo": {
+        "name": "Zoo Json Schema Demo",
+         "protocol": "http",
+         "baseURL": "zoo.wtf",
+         "publicPath": "/api/v1/",
+         "auth": "key",
+         "keyParam": "api_key"
+    },
     "linkedin": {
        "name": "LinkedIn",
         "protocol": "http",
